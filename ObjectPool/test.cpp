@@ -50,22 +50,7 @@ TEST(PointTest, EmptyPool) {
 	ObjectPool<Point> p(0);
 	EXPECT_ANY_THROW(p.alloc());
 }
-/*
-TEST(PointTest, FewElements) {
-	ObjectPool<Point> p(2);
-	Point* p0 = p.alloc();
-	EXPECT_EQ(p0->X(), 0);
-	EXPECT_EQ(p0->Y(), 0);
 
-	auto p1 = p.alloc(1, 2);
-	EXPECT_ANY_THROW(p.alloc(3, 2));
-	EXPECT_EQ(p1->X(), 1);
-	EXPECT_EQ(p1->Y(), 1);
-	p.free(p1); //not delete object
-	EXPECT_NO_THROW(p.alloc(3, 2));
-	EXPECT_EQ(p1->X(), 3);
-	EXPECT_EQ(p1->Y(), 2);
-}*/
 TEST(PointTest, FreeDefault) {
 	ObjectPool<Point> p(10);
 	auto p1 = p.alloc();
@@ -110,22 +95,7 @@ TEST(BoardTest, EmptyPool) {
 	ObjectPool<Board> p(0);
 	EXPECT_ANY_THROW(p.alloc());
 }
-/*
-TEST(BoardTest, FewElements) {
-	ObjectPool<Board> p(2);
-	Board* p0 = p.alloc();
-	EXPECT_EQ(p0->Cols(), 0);
-	EXPECT_EQ(p0->Rows(), 0);
 
-	auto p1 = p.alloc(1, 2);
-	EXPECT_ANY_THROW(p.alloc(3, 2));
-	EXPECT_EQ(p1->Cols(), 1);
-	EXPECT_EQ(p1->Rows(), 1);
-	p.free(p1); //not delete object
-	EXPECT_NO_THROW(p.alloc(3, 2));
-	EXPECT_EQ(p1->Cols(), 3);
-	EXPECT_EQ(p1->Rows(), 2);
-}*/
 TEST(BoardTest, FreeDefault) {
 	ObjectPool<Board> p(10);
 	auto p1 = p.alloc();
