@@ -6,57 +6,51 @@
 template<typename T>
 class ObjectPool final
 {
-	std::unique_ptr<T[]> data;
+	std::unique_ptr<uint8_t[]> data;
 	size_t size;
 	std::vector<bool> is_empty;
 
 public:
 
 	ObjectPool() = delete;
-	ObjectPool(size_t size) :data(std::make_unique<T[]>(size)), size(size)
-	{
-		is_empty.resize(size, true);
-	}
-	ObjectPool(const ObjectPool<T>& other) : data(new T(*other.data)), size(other.size),
-		is_empty(other.is_empty) {};
+	ObjectPool(size_t size) :data(std::make_unique<uint8_t[]>(size * sizeof(T))), size(size), is_empty(size, true) {}
+
 	virtual ~ObjectPool()
 	{
-		for (size_t i = 0; i < size; ++i)
-			free(data.get() + i);
-
-		data.release();
-	}
-	ObjectPool<T>& operator=(const ObjectPool<T>& other)
-	{
-		data.reset(new T(*other.data));
-		return *this;
+		for (size_t i = 0; i < size; ++i) {
+			if (!is_empty[i])
+				reinterpret_cast<T*>(data.get() + i * sizeof(T))->~T();
+		}
+			
 	}
 
 	template <typename... Args>
-	T* alloc(Args&& ... args)
+	T& alloc(Args&& ... args)
 	{
 		for (size_t i = 0; i < is_empty.size(); ++i)
 		{
 			if (is_empty[i])
 			{
+				auto p = new(data.get() + i * sizeof(T)) T{ std::forward<Args>(args)... };
 				is_empty[i] = false;
-				return  (new (data.get() + i) T(std::forward<Args>(args)...));
+				return *p;
 			}
 		}
-		throw std::out_of_range("Pool is full");
+		throw std::out_of_range("Pool is full!");
 	};
 
 
-	void free(T* obj)
+	void free(T& obj)
 	{
 		for (size_t i = 0; i < size; ++i)
 		{
-			if (!is_empty[i] && (data.get() + i) == obj)
+			if (!is_empty[i] && (data.get() + i * sizeof(T)) == reinterpret_cast<uint8_t*>(&obj))
 			{
 				is_empty[i] = true;
-				obj->~T();
+				obj.~T();
 				return;
 			}
 		}
+		throw std::out_of_range("Pool is empty!");
 	};
 };

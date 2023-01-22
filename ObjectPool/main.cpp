@@ -12,11 +12,9 @@ int main(int argc, char** argv)
 
 	try {
 		ObjectPool<int> op(10);
-		int* elem = op.alloc(1);
-		auto elem1 = op.alloc(1);
-		//for (int i = 0; i < 10; ++i)
-			//std::cout << *(arr.get() + i) << std::endl;
-		std::cout << *elem << " " << *elem1 << std::endl;
+		int& elem = op.alloc(1);
+		auto& elem1 = op.alloc(1);
+		std::cout << elem << " " << elem1 << std::endl;
 
 	}
 	catch (std::out_of_range)
